@@ -1,0 +1,2 @@
+gametest3d.o: gametest3d.c ../include/simple_logger.h
+simple_logger.o: simple_logger.c ../include/simple_logger.h
