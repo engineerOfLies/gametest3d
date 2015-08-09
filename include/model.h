@@ -23,6 +23,18 @@
 #include <SDL.h>
 #include "sprite.h"
 
+typedef struct TriPoint_S
+{
+    GLuint v;   /**<vertex index*/
+    GLuint n;   /**<normal index*/
+    GLuint t;   /**<texel index*/
+}TriPoint;
+
+typedef struct
+{
+    TriPoint p[3];
+}Triangle;
+
 typedef struct Model_S
 {
     char   filename[512];
@@ -33,12 +45,12 @@ typedef struct Model_S
     Uint32 num_normals;
     
     GLuint vertex_bo;
-    GLuint triangle_bo;
+    GLuint vertex_ao;
     
     float *vertex_array;
     float *texel_array;
     float *normal_array;
-    float *triangle_array;
+    Triangle *triangle_array;
     
     Sprite *texture;        /**<pointer to texture data*/
     Uint8 used;             /**<refcount*/
@@ -69,5 +81,19 @@ Model *model_get_by_filename(char *filename);
  * @param texture the name of the texture file to load
  */
 void model_assign_texture(Model *model,char *texture);
+
+/**
+ * @brief get the memory size of the triangle buffer for the model
+ * @param model the model to check
+ * @return 0 on error, or the memory footprint otherwise
+ */
+size_t model_get_triangle_buffer_size(Model *model);
+
+/**
+ * @brief get the memory size of the vertex buffer for the model
+ * @param model the model to check
+ * @return 0 on error, or the memory footprint otherwise
+ */
+size_t model_get_vertex_buffer_size(Model *model);
 
 #endif

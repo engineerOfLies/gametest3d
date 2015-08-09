@@ -96,6 +96,16 @@ void model_assign_texture(Model *model,char *texture)
     model->texture = sprite;
 }
 
+size_t model_get_triangle_buffer_size(Model *model)
+{
+    if (!model)return 0;
+    return (sizeof(GLuint)*9*model->num_tris);
+}
 
+size_t model_get_vertex_buffer_size(Model *model)
+{
+    if (!model)return 0;
+    return (sizeof(float)*3*model->num_vertices);
+}
 
 /*eol@eof*/
