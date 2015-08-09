@@ -2,5 +2,6 @@ gametest3d.o: gametest3d.c ../include/simple_logger.h \
  ../include/graphics3d.h ../include/shader.h
 graphics3d.o: graphics3d.c ../include/graphics3d.h \
  ../include/simple_logger.h ../include/shader.h
+obj.o: obj.c ../include/obj.h
 shader.o: shader.c ../include/shader.h ../include/simple_logger.h
 simple_logger.o: simple_logger.c ../include/simple_logger.h
