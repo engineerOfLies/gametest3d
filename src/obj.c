@@ -154,7 +154,7 @@ void obj_file_parse(Model * model, FILE* file)
             case 'f':
                 fscanf(
                     file,
-                    "%ui/%ui/%ui %ui/%ui/%ui %ui/%ui/%ui",
+                    "%u/%u/%u %u/%u/%u %u/%u/%u",
                     &v1,
                     &t1,
                     &n1,
@@ -173,8 +173,6 @@ void obj_file_parse(Model * model, FILE* file)
                 model->triangle_array[numfaces].p[2].v = v3;
                 model->triangle_array[numfaces].p[2].t = t3;
                 model->triangle_array[numfaces].p[2].n = n3;
-                slog("triangle vertices: %i,%i,%i",model->triangle_array[numfaces].p[0].v,model->triangle_array[numfaces].p[1].v,model->triangle_array[numfaces].p[2].v);
-                slog("scraped  vertices: %i,%i,%i",v1,v2,v3);
                 numfaces++;
                 break;
             default:

@@ -99,7 +99,7 @@ void model_assign_texture(Model *model,char *texture)
 size_t model_get_triangle_buffer_size(Model *model)
 {
     if (!model)return 0;
-    return (sizeof(GLuint)*9*model->num_tris);
+    return (sizeof(Triangle)*model->num_tris);
 }
 
 size_t model_get_vertex_buffer_size(Model *model)
