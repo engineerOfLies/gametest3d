@@ -1,5 +1,6 @@
-#ifndef __SIMPLE_LOGGER__
-#define __SIMPLE_LOGGER__
+#ifndef __GRAPHICS3D_H__
+#define __GRAPHICS3D_H__
+
 /**
  * simple_logger
  * @license The MIT License (MIT)
@@ -20,22 +21,29 @@
  *    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *    SOFTWARE.
  */
+#include <SDL2/SDL.h>
+#include <GL/glew.h>
 
 /**
-  @brief initializes the simple logger.  Will automatically cleanup at program exit.
-
-  @param log_file_path the file to log to
-*/
-void init_logger(const char *log_file_path);
+ * @brief initialize the 3d graphics system
+ * @param sw the screen width you want
+ * @param sh the screen height you want
+ * @param fullscreen set true to initialize to fullscreen
+ * @param project the name to appear on the game window
+ * @param frameDelay the desired delay (in ms) between frames
+ * @return -1 on error, 0 otherwise
+ */
+int graphics3d_init(int sw,int sh,int fullscreen,const char *project, Uint32 frameDelay);
 
 /**
-  @brief logs a message to stdout and to the configured log file
-  @param msg a string with tokens
-  @param ... variables to be put into the tokens.
-*/
-#define slog(...) _slog(__FILE__,__LINE__,__VA_ARGS__)
-void _slog(char *f,int l,char *msg,...);
+ * @brief get the active shader program index
+ * @return 0 on error or the index of the active shader program
+ */
+GLuint graphics3d_get_shader_program();
 
+/**
+ * @brief advance the frame, taking into account desired frame rate
+ */
+void graphics3d_next_frame();
 
 #endif
-
