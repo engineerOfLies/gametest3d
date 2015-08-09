@@ -1,7 +1,13 @@
 gametest3d.o: gametest3d.c ../include/simple_logger.h \
- ../include/graphics3d.h ../include/shader.h
+ ../include/graphics3d.h ../include/shader.h ../include/obj.h \
+ ../include/model.h ../include/sprite.h ../include/graphics3d.h
 graphics3d.o: graphics3d.c ../include/graphics3d.h \
  ../include/simple_logger.h ../include/shader.h
-obj.o: obj.c ../include/obj.h
+model.o: model.c ../include/model.h ../include/sprite.h \
+ ../include/graphics3d.h
+obj.o: obj.c ../include/obj.h ../include/model.h ../include/sprite.h \
+ ../include/graphics3d.h ../include/simple_logger.h
 shader.o: shader.c ../include/shader.h ../include/simple_logger.h
 simple_logger.o: simple_logger.c ../include/simple_logger.h
+sprite.o: sprite.c ../include/sprite.h ../include/graphics3d.h \
+ ../include/simple_logger.h ../include/graphics3d.h

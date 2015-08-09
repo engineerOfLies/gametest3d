@@ -82,8 +82,6 @@ int graphics3d_init(int sw,int sh,int fullscreen,const char *project,Uint32 fram
         return -1;
     }
     
-    slog("Using program %d", __graphics3d_shader_program);
-        
     atexit(graphics3d_close);
     return 0;
 }

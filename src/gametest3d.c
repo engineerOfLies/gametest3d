@@ -21,6 +21,7 @@
 #include "simple_logger.h"
 #include "graphics3d.h"
 #include "shader.h"
+#include "obj.h"
 
 int main(int argc, char *argv[])
 {
@@ -28,6 +29,7 @@ int main(int argc, char *argv[])
     GLuint triangleBufferObject;
     char bGameLoopRunning = 1;
     SDL_Event e;
+    Model *model;
     const float triangleVertices[] = {
         0.0f, 0.5f, 0.0f, 1.0f,
         0.5f, -0.366f, 0.0f, 1.0f,
@@ -43,7 +45,8 @@ int main(int argc, char *argv[])
     {
         return -1;
     }
-        
+    model_init();
+    
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao); //make our vertex array object, we need it to restore state we set after binding it. Re-binding reloads the state associated with it.
     
@@ -52,7 +55,8 @@ int main(int argc, char *argv[])
     glBufferData(GL_ARRAY_BUFFER, sizeof(triangleVertices), triangleVertices, GL_STATIC_DRAW); //formatting the data for the buffer
     glBindBuffer(GL_ARRAY_BUFFER, 0); //unbind any buffers
     
-    slog("glError: %d", glGetError());
+    model = obj_load_model("models/mountainvillage.obj");
+    
     
     while (bGameLoopRunning)
     {
