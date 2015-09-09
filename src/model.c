@@ -76,8 +76,6 @@ Model *model_get_by_filename(char *filename)
         if ((ModelList[i].used != 0) &&
             (strcmp(ModelList[i].filename,filename) == 0))
         {
-            memset(&ModelList[i],0,sizeof(Model));
-            ModelList[i].used = 1;
             return &ModelList[i];
         }
     }

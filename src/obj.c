@@ -36,8 +36,6 @@ Obj *obj_get_by_filename(char *filename)
         if ((ObjList[i].used != 0) &&
             (strcmp(ObjList[i].filename,filename) == 0))
         {
-            memset(&ObjList[i],0,sizeof(Obj));
-            ObjList[i].used = 1;
             return &ObjList[i];
         }
     }
