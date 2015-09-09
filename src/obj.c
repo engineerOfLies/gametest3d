@@ -1,7 +1,33 @@
 #include "obj.h"
 #include "simple_logger.h"
 
-void obj_file_get_counts(Model* model, FILE* file)
+typedef struct TriPoint_S
+{
+    GLuint v;   /**<vertex index*/
+    GLuint n;   /**<normal index*/
+    GLuint t;   /**<texel index*/
+}TriPoint;
+
+typedef struct
+{
+    TriPoint p[3];
+}ObjTriangle;
+
+typedef struct
+{
+    Uint32 num_tris;
+    Uint32 num_vertices;
+    Uint32 num_texels;
+    Uint32 num_normals;
+    
+    float *vertex_array;
+    float *texel_array;
+    float *normal_array;
+    ObjTriangle *triangle_array;
+    
+}ObjFile;
+
+void obj_file_get_counts(ObjFile* model, FILE* file)
 {
     char buf[1024];
     int  numvertices = 0;
@@ -52,7 +78,7 @@ void obj_file_get_counts(Model* model, FILE* file)
     model->num_normals = numnormals;
 }
 
-void obj_model_allocate(Model *model)
+void obj_model_allocate(ObjFile *model)
 {
     if (!model)return;
     if (model->num_vertices)
@@ -81,15 +107,15 @@ void obj_model_allocate(Model *model)
     }
     if (model->num_tris)
     {
-        model->triangle_array = malloc(sizeof(Triangle)*model->num_tris);
+        model->triangle_array = malloc(sizeof(ObjTriangle)*model->num_tris);
         if (model->triangle_array)
         {
-            memset(model->triangle_array,0,sizeof(Triangle)*model->num_tris);
+            memset(model->triangle_array,0,sizeof(ObjTriangle)*model->num_tris);
         }
     }
 }
 
-void obj_file_parse(Model * model, FILE* file)
+void obj_file_parse(ObjFile * model, FILE* file)
 {
     int  numvertices = 0;
     int  numnormals = 0;
@@ -183,130 +209,85 @@ void obj_file_parse(Model * model, FILE* file)
     }
 }
 
-void obj_model_sort(Model *model)
+int obj_va_search(float *v,float *a,int count,float vtarget[3],float atarget[6])
 {
-    float *vertex_array;
-    float *texel_array;
-    float *normal_array;
-    int count;
     int i;
-    if (!model)
+    if (!v || !a)
     {
-        return;
+        slog("error, missing a buffer to search");
+        return -1;/*not found*/
     }
-    count = model->num_tris * 3;
-    if (model->num_vertices)
+    for (i = 0; i < count;i++)
     {
-        vertex_array = malloc(sizeof(float)*3*count);
-        if (vertex_array)
+        if (memcmp(&v[i * 3],vtarget,sizeof(float)*3) != 0)
         {
-            memset(vertex_array,0,sizeof(float)*3*count);
+            /*not equal, keep searching*/
+            continue;
         }
-    }
-    if (model->num_normals)
-    {
-        normal_array = malloc(sizeof(float)*3*count);
-        if (normal_array)
+        if (memcmp(&a[i * 3],atarget,sizeof(float)*6) != 0)
         {
-            memset(normal_array,0,sizeof(float)*3*count);
+            /*not equal, keep searching*/
+            continue;
         }
+        return i;
     }
-    if (model->num_texels)
-    {
-        texel_array = malloc(sizeof(float)*2*count);
-        if (texel_array)
-        {
-            memset(texel_array,0,sizeof(float)*2*count);
-        }
-    }
-    /*sort everything into triangle order*/
-    for (i = 0; i < model->num_tris; i++)
-    {
-        if (model->vertex_array)
-        {
-            vertex_array[(i*9)]     = model->vertex_array[(model->triangle_array[i].p[0].v * 3)];
-            vertex_array[(i*9) + 1] = model->vertex_array[(model->triangle_array[i].p[0].v * 3) + 1];
-            vertex_array[(i*9) + 2] = model->vertex_array[(model->triangle_array[i].p[0].v * 3) + 2];
-            
-            vertex_array[(i*9) + 3] = model->vertex_array[(model->triangle_array[i].p[1].v * 3)];
-            vertex_array[(i*9) + 4] = model->vertex_array[(model->triangle_array[i].p[1].v * 3) + 1];
-            vertex_array[(i*9) + 5] = model->vertex_array[(model->triangle_array[i].p[1].v * 3) + 2];
-            
-            vertex_array[(i*9) + 6] = model->vertex_array[(model->triangle_array[i].p[2].v * 3)];
-            vertex_array[(i*9) + 7] = model->vertex_array[(model->triangle_array[i].p[2].v * 3) + 1];
-            vertex_array[(i*9) + 8] = model->vertex_array[(model->triangle_array[i].p[2].v * 3) + 2];
-        }
-        if (model->normal_array)
-        {
-            normal_array[(i*9)]     = model->normal_array[(model->triangle_array[i].p[0].n * 3)];
-            normal_array[(i*9) + 1] = model->normal_array[(model->triangle_array[i].p[0].n * 3) + 1];
-            normal_array[(i*9) + 2] = model->normal_array[(model->triangle_array[i].p[0].n * 3) + 2];
-
-            normal_array[(i*9) + 3] = model->normal_array[(model->triangle_array[i].p[1].n * 3)];
-            normal_array[(i*9) + 4] = model->normal_array[(model->triangle_array[i].p[1].n * 3) + 1];
-            normal_array[(i*9) + 5] = model->normal_array[(model->triangle_array[i].p[1].n * 3) + 2];
-
-            normal_array[(i*9) + 6] = model->normal_array[(model->triangle_array[i].p[2].n * 3)];
-            normal_array[(i*9) + 7] = model->normal_array[(model->triangle_array[i].p[2].n * 3) + 1];
-            normal_array[(i*9) + 8] = model->normal_array[(model->triangle_array[i].p[2].n * 3) + 2];
-        }
-
-        if (model->normal_array)
-        {
-            texel_array[(i*6)]     = model->texel_array[(model->triangle_array[i].p[0].t * 2)];
-            texel_array[(i*6) + 1] = model->texel_array[(model->triangle_array[i].p[0].t * 2) + 1];
-
-            texel_array[(i*6) + 2] = model->texel_array[(model->triangle_array[i].p[1].t * 2)];
-            texel_array[(i*6) + 3] = model->texel_array[(model->triangle_array[i].p[1].t * 2) + 1];
-
-            texel_array[(i*6) + 4] = model->texel_array[(model->triangle_array[i].p[2].t * 2)];
-            texel_array[(i*6) + 5] = model->texel_array[(model->triangle_array[i].p[2].t * 2) + 1];
-        }
-    }
-    if (vertex_array)
-    {
-        if (model->vertex_array)free(model->vertex_array);
-        model->vertex_array = vertex_array;
-    }
-    if (texel_array)
-    {
-        if (model->texel_array)free(model->texel_array);
-        model->texel_array = texel_array;
-    }
-    if (normal_array)
-    {
-        if (model->normal_array)free(model->normal_array);
-        model->normal_array = normal_array;
-    }
+    return -1;/*not found*/
 }
 
-void obj_model_setup(Model *model)
+int obj_file_convert_to_model(ObjFile *objFile,Model *model)
 {
-    if (!model)return;
+    int i,j,count = 0;
+    float *vertices; /**<working vertex buffer*/
+    float *attributes; /**<working attribute buffer*/
+    float *vtarget,atarget[6];
+    if ((!model) || (!objFile))
+    {
+        slog("passed null data!");
+        return -1;
+    }
+    /*go through each triangle, building one synchronous vertex buffer and one attribute buffer*/
+    vertices = (float *)malloc(sizeof(float) * objFile->num_tris * 3 * 3);
+    attributes = (float *)malloc(sizeof(float) * objFile->num_tris * 3 * 3 * 2);/*packing in normals and uvs*/
+    if ((!vertices) || (!attributes))
+    {
+        slog("failed to alloacte vertex / attribute buffers!");
+        if (vertices)free(vertices);
+        if (attributes)free(attributes);
+        return -1;
+    }
+    
+    memset(atarget,0,sizeof(float)*6);
+    /*for each triangle...*/
+    for (i = 0; i < objFile->num_tris;i++)
+    {
+        /*for each triangle vertex...*/
+        for (j = 0;j < 3;j++)
+        {
+            /*get a pointer to the vertex data*/
+            vtarget = &objFile->vertex_array[objFile->triangle_array[i].p[j].v];
 
-    glGenBuffers(1, &model->vertex_bo); //create the buffer
+            /*copy the normal data*/
+            memcpy(atarget,&objFile->normal_array[objFile->triangle_array[i].p[j].n],sizeof(float)*3);
+
+            /*copy the texture data*/
+            memcpy(&atarget[3],&objFile->texel_array[objFile->triangle_array[i].p[j].t],sizeof(float)*2);
+            
+            /*check if we already had this vertex/normal/uv set before*/
+            if (obj_va_search(vertices,attributes,count,vtarget,atarget) == -1)
+            {
+                /*new index*/
+            }
+        }   
+    }
     
-    glGenVertexArrays(1, &model->vertex_ao);
-    glBindVertexArray(model->vertex_ao);
-    glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, model->vertex_bo); 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0); 
-    
-    
-    glBufferData(GL_ARRAY_BUFFER, model_get_vertex_buffer_size(model), &model->vertex_array, GL_STATIC_DRAW);
-    
-    
-    
-/*    glBindBuffer(GL_ARRAY_BUFFER, model->triangle_bo); //we're "using" this one now
-    glBufferData(GL_ARRAY_BUFFER, model_get_triangle_buffer_size(model), &model->triangle_array, GL_STATIC_DRAW); //formatting the data for the buffer
-*/
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    return 0;
 }
 
 Model *obj_load_model(char *filename)
 {
     FILE *file;
     Model *model;
+    ObjFile objFile;
     model = model_get_by_filename(filename);
     if (model)
     {
@@ -321,23 +302,27 @@ Model *obj_load_model(char *filename)
     if (file == NULL)
     {
         slog("failed to open file %s",filename);
+        model_free(model);
         return NULL;
     }
         
-    obj_file_get_counts(model,file);
+    obj_file_get_counts(&objFile,file);
     
-    slog("vertices: %i",model->num_vertices);
-    slog("normals: %i",model->num_normals);
-    slog("texels: %i",model->num_texels);
-    slog("faces: %i",model->num_tris);
+    slog("vertices: %i",objFile.num_vertices);
+    slog("normals: %i",objFile.num_normals);
+    slog("texels: %i",objFile.num_texels);
+    slog("faces: %i",objFile.num_tris);
     
-    obj_model_allocate(model);
-    obj_file_parse(model, file);
+    obj_model_allocate(&objFile);
+    obj_file_parse(&objFile, file);
     
     fclose(file);
     
-    obj_model_sort(model);
-    obj_model_setup(model);
+    if (obj_file_convert_to_model(&objFile,model) != 0)
+    {
+        model_free(model);        
+        return NULL;
+    }
     
     return model;
 }

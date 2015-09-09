@@ -21,13 +21,9 @@ static void model_delete(Model *model)
     {
         free(model->vertex_array);
     }
-    if (model->texel_array)
+    if (model->attribute_array)
     {
-        free(model->texel_array);
-    }
-    if (model->normal_array)
-    {
-        free(model->normal_array);
+        free(model->attribute_array);
     }
     if (model->triangle_array)
     {
@@ -99,7 +95,7 @@ void model_assign_texture(Model *model,char *texture)
 size_t model_get_triangle_buffer_size(Model *model)
 {
     if (!model)return 0;
-    return (sizeof(Triangle)*model->num_tris);
+    return (sizeof(GLshort)*model->num_tris*3);
 }
 
 size_t model_get_vertex_buffer_size(Model *model)

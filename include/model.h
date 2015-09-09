@@ -23,34 +23,20 @@
 #include <SDL.h>
 #include "sprite.h"
 
-typedef struct TriPoint_S
-{
-    GLuint v;   /**<vertex index*/
-    GLuint n;   /**<normal index*/
-    GLuint t;   /**<texel index*/
-}TriPoint;
-
-typedef struct
-{
-    TriPoint p[3];
-}Triangle;
-
 typedef struct Model_S
 {
     char   filename[512];
     
     Uint32 num_tris;
     Uint32 num_vertices;
-    Uint32 num_texels;
-    Uint32 num_normals;
     
     GLuint vertex_bo;
-    GLuint vertex_ao;
+    GLuint face_eab;    /**<element array buffer for triangle data*/
     
-    float *vertex_array;
-    float *texel_array;
-    float *normal_array;
-    Triangle *triangle_array;
+    float *vertex_array;    /**<vertex positions*/
+    float *attribute_array; /**<normals and uvs packed NUNUNUNU*/
+
+    GLushort *triangle_array;
     
     Sprite *texture;        /**<pointer to texture data*/
     Uint8 used;             /**<refcount*/
@@ -67,6 +53,12 @@ void model_init();
  * @return NULL on error or out of space, a zero initialized model pointer otherwise
  */
 Model *model_new();
+
+/**
+ * @brief frees a loaded model
+ * @param model a pointer to the model to free
+ */
+void model_free(Model *model);
 
 /**
  * @brief checks if the model file is already loaded and returns a pointer to it if it is
