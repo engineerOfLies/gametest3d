@@ -1,3 +1,4 @@
+#include "simple_logger.h"
 #include "model.h"
 
 #define __model_max 1024
@@ -91,6 +92,112 @@ void model_assign_texture(Model *model,char *texture)
     if (!sprite)return;
     model->texture = sprite;
 }
+
+int model_allocate_triangle_buffer(Model *model, GLuint triangles)
+{
+    if (!model)
+    {
+        slog("no model specified");
+        return -1;
+    }
+    if (model->triangle_array != NULL)
+    {
+        slog("model %s already has a triangle buffer");
+        return -1;
+    }
+    if (!triangles)
+    {
+        slog("cannot allocate 0 triangles!");
+        return -1;
+    }
+    model->triangle_array = (GLuint *)malloc(sizeof(GLuint)*3*triangles);
+    if (!model->triangle_array)
+    {
+        slog("failed to allocate triangle buffer");
+        return -1;
+    }
+    memset(model->triangle_array,0,sizeof(GLuint)*3*triangles);
+    model->num_tris = triangles;
+    return 0;
+}
+
+int model_set_vertex_buffer(Model *model, float *vertex_buffer, GLuint count)
+{
+    if (model_allocate_vertex_buffer(model, count) != 0)
+    {
+        return -1;
+    }
+    memcpy(model->vertex_array,vertex_buffer,sizeof(float)*count *3);
+    return 0;
+}
+
+int model_set_attribute_buffer(Model *model, float *attribute_buffer, GLuint count)
+{
+    if (model_allocate_attribute_buffer(model, count) != 0)
+    {
+        return -1;
+    }
+    memcpy(model->attribute_array,attribute_buffer,sizeof(float)*count *6);
+    return 0;
+}
+
+
+int model_allocate_vertex_buffer(Model *model, GLuint vertices)
+{
+    if (!model)
+    {
+        slog("no model specified");
+        return -1;
+    }
+    if (model->vertex_array != NULL)
+    {
+        slog("model %s already has a vertex buffer");
+        return -1;
+    }
+    if (!vertices)
+    {
+        slog("cannot allocate 0 vertices!");
+        return -1;
+    }
+    model->vertex_array = (float *)malloc(sizeof(float)*3*vertices);
+    if (!model->vertex_array)
+    {
+        slog("failed to allocate vertex buffer");
+        return -1;
+    }
+    memset(model->vertex_array,0,sizeof(float)*3*vertices);
+    model->num_vertices = vertices;
+    return 0;
+}
+
+int model_allocate_attribute_buffer(Model *model, GLuint attributes)
+{
+    if (!model)
+    {
+        slog("no model specified");
+        return -1;
+    }
+    if (model->attribute_array != NULL)
+    {
+        slog("model %s already has a vertex buffer");
+        return -1;
+    }
+    if (!attributes)
+    {
+        slog("cannot allocate 0 attributes!");
+        return -1;
+    }
+    model->attribute_array = (float *)malloc(sizeof(float)*6*attributes);
+    if (!model->attribute_array)
+    {
+        slog("failed to allocate vertex buffer");
+        return -1;
+    }
+    memset(model->attribute_array,0,sizeof(float)*6*attributes);
+    return 0;
+}
+
+
 
 size_t model_get_triangle_buffer_size(Model *model)
 {

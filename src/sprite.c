@@ -51,6 +51,7 @@ Sprite *LoadSprite(char *filename,int fw, int fh)
 {
     Sprite *sprite;
     SDL_Surface *image;
+    int Mode = GL_RGB;
     
     sprite = SpriteGetByFilename(filename);
     if (sprite)return sprite;
@@ -75,6 +76,20 @@ Sprite *LoadSprite(char *filename,int fw, int fh)
     }
     /*set the rest of the data*/
     
+    // You should probably use CSurface::OnLoad ... ;)
+    //-- and make sure the Surface pointer is good!
+    glGenTextures(1, &sprite->texture);
+    glBindTexture(GL_TEXTURE_2D, sprite->texture);
+    
+    
+    if(sprite->image->format->BytesPerPixel == 4) {
+        Mode = GL_RGBA;
+    }
+    
+    glTexImage2D(GL_TEXTURE_2D, 0, Mode, sprite->image->w, sprite->image->h, 0, Mode, GL_UNSIGNED_BYTE, sprite->image->pixels);
+    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);    
     return sprite;
 }
 

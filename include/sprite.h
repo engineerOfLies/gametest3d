@@ -9,6 +9,7 @@
 typedef struct Sprite_T
 {
     SDL_Surface *image;               /**<pointer to the actual image in memory*/
+    GLuint texture;
     char  filename[MAXSPRITEFILENAME]; /**<the name of the file, keep them short*/
     int   w, h;                         /**<the width and height of the frames of the sprites, not the file itself*/
     int   framesperline;                /**<default is 16*/

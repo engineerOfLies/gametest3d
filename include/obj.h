@@ -21,10 +21,45 @@
  *    SOFTWARE.
  */
 #include "model.h"
+#include "vector.h"
 
 /**
  * @purpse provide an interface to load and parse object files into the model data type
  */
+
+typedef struct TriPoint_S
+{
+    GLuint v;   /**<vertex index*/
+    GLuint n;   /**<normal index*/
+    GLuint t;   /**<texel index*/
+}TriPoint;
+
+typedef struct
+{
+    TriPoint p[3];
+}ObjTriangle;
+
+typedef struct
+{
+    char   filename[512];
+    
+    Uint32 num_tris;
+    Uint32 num_vertices;
+    Uint32 num_texels;
+    Uint32 num_normals;
+    
+    float *vertex_array;
+    float *texel_array;
+    float *normal_array;
+    ObjTriangle *triangle_array;
+    
+    Uint8 used;             /**<refcount*/
+}Obj;
+
+/**
+ * @brief initialize the object subsystem
+ */
+void obj_init();
 
 /**
  * @brief load an object file into a model
@@ -32,5 +67,31 @@
  * @return NULL on failure or a model pointer otherwise;
  */
 Model *obj_load_model(char *filename);
+
+/**
+ * @brief load an object file into an obj
+ * @param filename the object file to parse
+ * @return NULL on failure or an Obj pointer otherwise;
+ */
+Obj *obj_load(char *filename);
+
+/**
+ * @brief draw an object primitive
+ * @param obj the obj to draw
+ * @param position the position to draw it at
+ * @param rotation the yaw, pitch and roll of the obj to draw
+ * @param scale the x,y,z stretch of the obj.  1,1,1 is no deformation
+ * @param color the r,g,b,a value for the model as a whole
+ * @param texture [optional] if provided, render with texture
+ */
+void obj_draw(
+    Obj *obj,
+    Vec3D position,
+    Vec3D rotation,
+    Vec3D scale,
+    Vec4D color,
+    Sprite *texture
+);
+
 
 #endif

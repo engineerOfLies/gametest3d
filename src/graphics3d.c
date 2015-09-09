@@ -1,6 +1,8 @@
 #include "graphics3d.h"
 #include "simple_logger.h"
 #include "shader.h"
+#include <GL/glu.h>
+
 
 static SDL_GLContext __graphics3d_gl_context;
 static SDL_Window  * __graphics3d_window = NULL;
@@ -14,18 +16,7 @@ GLuint graphics3d_get_shader_program()
     return __graphics3d_shader_program;
 }
 
-void graphics3d_next_frame()
-{
-    static Uint32 then = 0;
-    Uint32 now;
-    SDL_GL_SwapWindow(__graphics3d_window);
-    now = SDL_GetTicks();
-    if ((now - then) < __graphics3d_frame_delay)
-    {
-        SDL_Delay(__graphics3d_frame_delay - (now - then));        
-    }
-    then = now;
-}
+void graphics3d_setup_default_light();
 
 int graphics3d_init(int sw,int sh,int fullscreen,const char *project,Uint32 frameDelay)
 {
@@ -82,6 +73,29 @@ int graphics3d_init(int sw,int sh,int fullscreen,const char *project,Uint32 fram
         return -1;
     }
     
+    
+    glViewport(0,0,sw, sh);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    /*view angle, aspect ratio, near clip distance, far clip distance*/
+    /*TODO: put near/far clip in graphics view config*/
+    gluPerspective( 40, (float)sw / (float)sh, .01, 2000.0f);
+    glMatrixMode( GL_MODELVIEW );
+    glLoadIdentity();
+
+    glClearColor(0.0,0.0,0.0,0.0);
+    glClear( 1 );
+    
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
+    
+    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+
+    /*Enables alpha testing*/
+/*    glAlphaFunc(GL_GREATER,0);
+    glEnable(GL_ALPHA_TEST);*/
+    
+    graphics3d_setup_default_light();
     atexit(graphics3d_close);
     return 0;
 }
@@ -89,6 +103,78 @@ int graphics3d_init(int sw,int sh,int fullscreen,const char *project,Uint32 fram
 void graphics3d_close()
 {
     SDL_GL_DeleteContext(__graphics3d_gl_context);
+}
+
+void graphics3d_frame_begin()
+{
+    glClearColor(0.0,0.0,0.0,0.0);
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    glLoadIdentity();
+    glPushMatrix();
+}
+
+void graphics3d_next_frame()
+{
+    static Uint32 then = 0;
+    Uint32 now;
+    glPopMatrix();
+    SDL_GL_SwapWindow(__graphics3d_window);
+    now = SDL_GetTicks();
+    if ((now - then) < __graphics3d_frame_delay)
+    {
+        SDL_Delay(__graphics3d_frame_delay - (now - then));        
+    }
+    then = now;
+}
+
+void graphics3d_setup_default_light()
+{
+    GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat mat_shininess[] = { 50.0 };
+    GLfloat light_position[] = { -10.0, -10.0, 10.0, 0.0 };
+    GLfloat light_ambient[] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+    
+    GLfloat light1_ambient[] = { 1.2, 1.2, 1.2, 1.0 };
+    GLfloat light1_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat light1_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat light1_position[] = { -20.0, 2.0, 1.0, 1.0 };
+    GLfloat spot_direction[] = { -1.0, -1.0, 0.0 };
+    
+    GLfloat lmodel_ambient[] = { 0.4, 0.4, 0.4, 1.0 };
+    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, lmodel_ambient);
+    
+    //glShadeModel (GL_SMOOTH);
+    
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+    
+    
+    glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+    
+    
+    glLightfv(GL_LIGHT1, GL_AMBIENT, light1_ambient);
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, light1_diffuse);
+    glLightfv(GL_LIGHT1, GL_SPECULAR, light1_specular);
+    glLightfv(GL_LIGHT1, GL_POSITION, light1_position);
+    glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, 1.9);
+    glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.7);
+    glLightf(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.3);
+    
+    glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 80.0);
+    glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, spot_direction);
+    glLightf(GL_LIGHT1, GL_SPOT_EXPONENT, 2.0);
+    
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    glEnable(GL_LIGHT1);
+    glEnable(GL_DEPTH_TEST);
+    
 }
 
 

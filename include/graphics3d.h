@@ -24,6 +24,16 @@
 #include <SDL.h>
 #include <GL/glew.h>
 
+#define EPSILON   1e-6f
+
+#define TWOPI 6.283185308
+
+/* conversion factor for converting from radians to degrees*/
+#define RADTODEG  57.295779513082
+
+/* conversion factor for converting from degrees to radians*/
+#define DEGTORAD  0.017453292519943295769236907684886
+
 /**
  * @brief initialize the 3d graphics system
  * @param sw the screen width you want
@@ -40,6 +50,11 @@ int graphics3d_init(int sw,int sh,int fullscreen,const char *project, Uint32 fra
  * @return 0 on error or the index of the active shader program
  */
 GLuint graphics3d_get_shader_program();
+
+/**
+ * @brief clear the drawing context and ready the next frame
+ */
+void graphics3d_frame_begin();
 
 /**
  * @brief advance the frame, taking into account desired frame rate
