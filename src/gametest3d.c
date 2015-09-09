@@ -78,7 +78,9 @@ int main(int argc, char *argv[])
         while ( SDL_PollEvent(&e) ) 
         {
             if (e.type == SDL_QUIT)
+            {
                 bGameLoopRunning = 0;
+            }
             else if (e.type == SDL_KEYDOWN)
             {
                 if (e.key.keysym.sym == SDLK_ESCAPE)
@@ -87,15 +89,11 @@ int main(int argc, char *argv[])
                 }
                 else if (e.key.keysym.sym == SDLK_SPACE)
                 {
-                    cameraPosition.z++,
-                    slog("move up");
-                    slog("(%f,%f,%f)",cameraPosition.x,cameraPosition.y,cameraPosition.z);
+                    cameraPosition.z++;
                 }
                 else if (e.key.keysym.sym == SDLK_z)
                 {
-                    cameraPosition.z--,
-                    slog("move down");
-                    slog("(%f,%f,%f)",cameraPosition.x,cameraPosition.y,cameraPosition.z);
+                    cameraPosition.z--;
                 }
                 else if (e.key.keysym.sym == SDLK_w)
                 {
@@ -107,8 +105,6 @@ int main(int argc, char *argv[])
                             cos(cameraRotation.z * DEGTORAD),
                             0
                         ));
-                    slog("move forward");
-                    slog("(%f,%f,%f)",cameraPosition.x,cameraPosition.y,cameraPosition.z);
                 }
                 else if (e.key.keysym.sym == SDLK_s)
                 {
@@ -120,8 +116,6 @@ int main(int argc, char *argv[])
                             -cos(cameraRotation.z * DEGTORAD),
                             0
                         ));
-                    slog("move back");
-                    slog("(%f,%f,%f)",cameraPosition.x,cameraPosition.y,cameraPosition.z);
                 }
                 else if (e.key.keysym.sym == SDLK_d)
                 {
@@ -133,8 +127,6 @@ int main(int argc, char *argv[])
                             sin(cameraRotation.z * DEGTORAD),
                             0
                         ));
-                    slog("move right");
-                    slog("(%f,%f,%f)",cameraPosition.x,cameraPosition.y,cameraPosition.z);
                 }
                 else if (e.key.keysym.sym == SDLK_a)
                 {
@@ -146,32 +138,22 @@ int main(int argc, char *argv[])
                             -sin(cameraRotation.z * DEGTORAD),
                             0
                         ));
-                    slog("move left");
-                    slog("(%f,%f,%f)",cameraPosition.x,cameraPosition.y,cameraPosition.z);
                 }
                 else if (e.key.keysym.sym == SDLK_LEFT)
                 {
                     cameraRotation.z += 1;
-                    slog("rotate left");
-                    slog("(%f,%f,%f)",cameraRotation.x,cameraRotation.y,cameraRotation.z);
                 }
                 else if (e.key.keysym.sym == SDLK_RIGHT)
                 {
                     cameraRotation.z -= 1;
-                    slog("right");
-                    slog("(%f,%f,%f)",cameraRotation.x,cameraRotation.y,cameraRotation.z);
                 }
                 else if (e.key.keysym.sym == SDLK_UP)
                 {
                     cameraRotation.x += 1;
-                    slog("up");
-                    slog("(%f,%f,%f)",cameraRotation.x,cameraRotation.y,cameraRotation.z);
                 }
                 else if (e.key.keysym.sym == SDLK_DOWN)
                 {
-                    slog("down");
                     cameraRotation.x -= 1;
-                    slog("(%f,%f,%f)",cameraRotation.x,cameraRotation.y,cameraRotation.z);
                 }
             }
         }
