@@ -1,3 +1,5 @@
+#include <stdio.h>
+#include <stdlib.h>
 #include "simple_logger.h"
 #include "model.h"
 
