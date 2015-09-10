@@ -407,7 +407,6 @@ void obj_draw(
     Sprite *texture
              )
 {
-#define LOGOBJ 0
     int i;
     ObjTriangle* triangle;
     float trans[4];
@@ -441,7 +440,6 @@ void obj_draw(
     glScalef(scale.x,scale.y,scale.z);
     
     glColor3f(color.x,color.y,color.z);
-    
     glBegin(GL_TRIANGLES);
     for (i = 0; i < obj->num_tris; i++)
     {
