@@ -1,3 +1,4 @@
+collisions.o: collisions.c ../include/collisions.h ../include/vector.h
 gametest3d.o: gametest3d.c ../include/simple_logger.h \
  ../include/graphics3d.h ../include/shader.h ../include/obj.h \
  ../include/model.h ../include/sprite.h ../include/graphics3d.h \
