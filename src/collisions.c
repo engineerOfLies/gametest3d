@@ -65,9 +65,21 @@ int sphere_cube_intersection(
         return 1;
     }
     
-    if ((center.x <= box.x) &&
+    if ((center.x <= box.x + r) &&
         (center.y <= box.y) &&
         (center.z <= box.z))
+    {
+        return 1;
+    }
+    if ((center.x <= box.x) &&
+        (center.y <= box.y + r) &&
+        (center.z <= box.z))
+    {
+        return 1;
+    }
+    if ((center.x <= box.x) &&
+        (center.y <= box.y) &&
+        (center.z <= box.z + r))
     {
         return 1;
     }
