@@ -3,6 +3,7 @@
 
 #include "obj.h"
 #include "vector.h"
+#include "sprite.h"
 #include "collisions.h"
 
 typedef struct Entity_S
@@ -18,7 +19,35 @@ typedef struct Entity_S
     Vec4D color;
     Cube bounds;
     Obj *objModel;
+    Sprite *texture;    /**<object texture*/
 }Entity;
 
+/**
+ * @brief initialize the entity sub system
+ * @param maxEntity the maximum number of simultaneously supported entities.
+ */
+void entity_init(int maxEntity);
+
+/**
+ * @brief get a pointer to a new entity
+ * @return NULL on no more entities or error,  a valid entity pointer otherwise
+ */
+Entity *entity_new();
+
+/**
+ * @brief draws all active entities
+ */
+void entity_draw_all();
+
+/**
+ * @brief draws an entity
+ * @param ent the entity to draw
+ */
+void entity_draw(Entity *ent);
+
+/**
+ * @brief frees an entity
+ */
+void entity_free(Entity *ent);
 
 #endif

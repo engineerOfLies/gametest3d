@@ -1,8 +1,12 @@
 collisions.o: collisions.c ../include/collisions.h ../include/vector.h
+entity.o: entity.c ../include/entity.h ../include/obj.h \
+ ../include/model.h ../include/sprite.h ../include/graphics3d.h \
+ ../include/vector.h ../include/collisions.h ../include/simple_logger.h
 gametest3d.o: gametest3d.c ../include/simple_logger.h \
  ../include/graphics3d.h ../include/shader.h ../include/obj.h \
  ../include/model.h ../include/sprite.h ../include/graphics3d.h \
- ../include/vector.h ../include/vector.h ../include/sprite.h
+ ../include/vector.h ../include/vector.h ../include/sprite.h \
+ ../include/entity.h ../include/obj.h ../include/collisions.h
 graphics3d.o: graphics3d.c ../include/graphics3d.h \
  ../include/simple_logger.h ../include/shader.h
 model.o: model.c ../include/simple_logger.h ../include/model.h \

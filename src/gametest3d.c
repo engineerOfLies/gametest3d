@@ -24,8 +24,23 @@
 #include "obj.h"
 #include "vector.h"
 #include "sprite.h"
+#include "entity.h"
 
 void set_camera(Vec3D position, Vec3D rotation);
+
+void newCube(Vec3D position)
+{
+    Entity * ent;
+    ent = entity_new();
+    if (!ent)
+    {
+        return;
+    }
+    ent->objModel = obj_load("models/cube.obj");
+    ent->texture = LoadSprite("models/cube_text.png",1024,1024);
+    vec3d_cpy(ent->position,position);
+    sprintf(ent->name,"cube");
+}
 
 int main(int argc, char *argv[])
 {
@@ -36,8 +51,8 @@ int main(int argc, char *argv[])
     Vec3D cameraPosition = {0,-10,0.3};
     Vec3D cameraRotation = {90,0,0};
     SDL_Event e;
-    Obj *obj,*bgobj;
-    Sprite *texture,*bgtext;
+    Obj *bgobj;
+    Sprite *bgtext;
     const float triangleVertices[] = {
         0.0f, 0.5f, 0.0f, 1.0f,
         0.5f, -0.366f, 0.0f, 1.0f,
@@ -55,6 +70,7 @@ int main(int argc, char *argv[])
     }
     model_init();
     obj_init();
+    entity_init(255);
     
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao); //make our vertex array object, we need it to restore state we set after binding it. Re-binding reloads the state associated with it.
@@ -64,15 +80,12 @@ int main(int argc, char *argv[])
     glBufferData(GL_ARRAY_BUFFER, sizeof(triangleVertices), triangleVertices, GL_STATIC_DRAW); //formatting the data for the buffer
     glBindBuffer(GL_ARRAY_BUFFER, 0); //unbind any buffers
     
-    obj = obj_load("models/cube.obj");
-    texture = LoadSprite("models/cube_text.png",1024,1024);
-
     bgobj = obj_load("models/mountainvillage.obj");
     bgtext = LoadSprite("models/mountain_text.png",1024,1024);
     
-//    obj = obj_load("models/mountainvillage.obj");
-    
-    
+    newCube(vec3d(0,0,0));
+    newCube(vec3d(10,0,0));
+        
     while (bGameLoopRunning)
     {
         while ( SDL_PollEvent(&e) ) 
@@ -165,7 +178,7 @@ int main(int argc, char *argv[])
             cameraPosition,
             cameraRotation);
         
-  
+        entity_draw_all();  
         obj_draw(
             bgobj,
             vec3d(0,0,2),
@@ -175,14 +188,6 @@ int main(int argc, char *argv[])
             bgtext
         );
         
-        obj_draw(
-            obj,
-            vec3d(0,0,0),
-            vec3d(90,r++,0),
-            vec3d(0.5,0.5,0.5),
-            vec4d(1,1,1,1),
-            texture
-        );
         if (r > 360)r -= 360;
         glPopMatrix();
         /* drawing code above here! */

@@ -76,6 +76,12 @@ Model *obj_load_model(char *filename);
 Obj *obj_load(char *filename);
 
 /**
+ * @brief free an object from memory if no longer in use
+ * @param obj the object to free
+ */
+void obj_free(Obj *obj);
+
+/**
  * @brief draw an object primitive
  * @param obj the obj to draw
  * @param position the position to draw it at
