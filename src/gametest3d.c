@@ -25,27 +25,32 @@
 #include "vector.h"
 #include "sprite.h"
 #include "entity.h"
+#include "space.h"
 
 void set_camera(Vec3D position, Vec3D rotation);
 
-void newCube(Vec3D position)
+Entity *newCube(Vec3D position)
 {
     Entity * ent;
     ent = entity_new();
     if (!ent)
     {
-        return;
+        return NULL;
     }
     ent->objModel = obj_load("models/cube.obj");
     ent->texture = LoadSprite("models/cube_text.png",1024,1024);
-    vec3d_cpy(ent->position,position);
+    vec3d_cpy(ent->body.position,position);
     sprintf(ent->name,"cube");
+    return ent;
 }
 
 int main(int argc, char *argv[])
 {
+    int i;
     GLuint vao;
     float r = 0;
+    Space *space;
+    Entity *cube1,*cube2;
     GLuint triangleBufferObject;
     char bGameLoopRunning = 1;
     Vec3D cameraPosition = {0,-10,0.3};
@@ -83,11 +88,22 @@ int main(int argc, char *argv[])
     bgobj = obj_load("models/mountainvillage.obj");
     bgtext = LoadSprite("models/mountain_text.png",1024,1024);
     
-    newCube(vec3d(0,0,0));
-    newCube(vec3d(10,0,0));
-        
+    cube1 = newCube(vec3d(0,0,0));
+    cube2 = newCube(vec3d(10,0,0));
+    
+    cube2->body.velocity.x = -0.1;
+    
+    space = space_new();
+    space_set_steps(space,100);
+    
+    space_add_body(space,&cube1->body);
+    space_add_body(space,&cube2->body);
     while (bGameLoopRunning)
     {
+        for (i = 0; i < 100;i++)
+        {
+            space_do_step(space);
+        }
         while ( SDL_PollEvent(&e) ) 
         {
             if (e.type == SDL_QUIT)

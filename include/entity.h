@@ -5,21 +5,20 @@
 #include "vector.h"
 #include "sprite.h"
 #include "collisions.h"
+#include "body.h"
 
 typedef struct Entity_S
 {
     int inuse;
     int uid;    /**<unique id of this entity*/
     char name[128];
-    Vec3D position;
-    Vec3D velocity;
     Vec3D acceleration;
     Vec3D rotation;
     Vec3D scale;
     Vec4D color;
-    Cube bounds;
     Obj *objModel;
     Sprite *texture;    /**<object texture*/
+    Body body;
 }Entity;
 
 /**

@@ -18,6 +18,19 @@ int sphere_sphere_intersection(
     return 0;
 }
 
+int cube_cube_intersection(
+    Cube a,
+    Cube b)
+{
+    if ((a.x > b.x + b.w) || (b.x > a.x + a.w) ||
+        (a.y > b.y + b.h) || (b.y > a.y + a.h) ||
+        (a.z > b.z + b.d) || (b.z > a.z + a.d))
+    {
+        return 0;
+    }
+    return 1;
+}
+
 int point_cube_intersection(
     Vec3D point,            /*point*/
     Vec3D box, Vec3D size)  /*cube*/

@@ -85,7 +85,7 @@ void entity_draw(Entity *ent)
     }
     obj_draw(
         ent->objModel,
-        ent->position,
+        ent->body.position,
         ent->rotation,
         ent->scale,
         ent->color,
