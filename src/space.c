@@ -46,6 +46,7 @@ void space_add_body(Space *space,Body *body)
     space->bodylist = g_list_append(space->bodylist,body);
 }
 
+
 static void space_body_update(Space *space,Body *body)
 {
     GList *it;
@@ -54,16 +55,19 @@ static void space_body_update(Space *space,Body *body)
     Vec3D stepVector;
     Vec3D stepOffVector;
     
+    if ((!body) || (body->_done))return;
+    
     vec3d_scale(stepVector,body->velocity,space->stepFactor);
     vec3d_negate(stepOffVector,stepVector);
     
     vec3d_add(body->position,body->position,stepVector);
     
-    vec3d_cpy(a,body->position);
+    a.x = body->position.x + body->bounds.x;
+    a.y = body->position.y + body->bounds.y;
+    a.z = body->position.z + body->bounds.z;
     a.w = body->bounds.w;
     a.h = body->bounds.h;
     a.d = body->bounds.d;
-    vec3d_add(a,a,body->bounds);
     
     for (it = space->bodylist;it != NULL;it = g_list_next(it))
     {
@@ -76,12 +80,17 @@ static void space_body_update(Space *space,Body *body)
         b.h = other->bounds.h;
         b.d = other->bounds.d;
         vec3d_add(b,b,other->bounds);
-        slog("doing body test");
         if (cube_cube_intersection(a,b))
         {
             /*call touch functions*/
             /*back the fuck off*/
-            vec3d_add(body->position,body->position,stepOffVector);
+            vec3d_cpy(body->_stepOffVector,stepOffVector);
+            body->_done = 1;
+            body->_needsBackoff = 1;
+            if (body->touch.function)
+            {
+                body->touch.function(body->touch.data,other);
+            }
         }
     }
 }
@@ -94,6 +103,11 @@ static void space_update(Space *space)
         if (!it->data)continue;
         space_body_update(space,(Body*)it->data);
     }
+    for (it = space->bodylist;it != NULL;it = g_list_next(it))
+    {
+        if (!it->data)continue;
+        body_process((Body *)it->data);
+    }
 }
 
 void space_do_step(Space *space)
@@ -102,6 +116,12 @@ void space_do_step(Space *space)
     if (space->stepstaken == space->steps)
     {
         space->stepstaken = 0;
+        GList *it;
+        for (it = space->bodylist;it != NULL;it = g_list_next(it))
+        {
+            if (!it->data)continue;
+            body_reset((Body *)it->data);
+        }
     }
     /*run one iteration of space update*/
     space_update(space);

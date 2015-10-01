@@ -49,4 +49,6 @@ void entity_draw(Entity *ent);
  */
 void entity_free(Entity *ent);
 
+int entity_is_entity(void *data);
+
 #endif

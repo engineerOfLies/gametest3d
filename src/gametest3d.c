@@ -18,6 +18,7 @@
  *    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *    SOFTWARE.
  */
+#include "mgl_callback.h"
 #include "simple_logger.h"
 #include "graphics3d.h"
 #include "shader.h"
@@ -29,7 +30,22 @@
 
 void set_camera(Vec3D position, Vec3D rotation);
 
-Entity *newCube(Vec3D position)
+void touch_callback(void *data, void *context)
+{
+    Entity *me,*other;
+    Body *obody;
+    if ((!data)||(!context))return;
+    me = (Entity *)data;
+    obody = (Body *)context;
+    if (entity_is_entity(obody->touch.data))
+    {
+        other = (Entity *)obody->touch.data;
+        slog("%s is ",other->name);
+    }
+    slog("touching me.... touching youuuuuuuu");
+}
+
+Entity *newCube(Vec3D position,const char *name)
 {
     Entity * ent;
     ent = entity_new();
@@ -40,33 +56,24 @@ Entity *newCube(Vec3D position)
     ent->objModel = obj_load("models/cube.obj");
     ent->texture = LoadSprite("models/cube_text.png",1024,1024);
     vec3d_cpy(ent->body.position,position);
-    sprintf(ent->name,"cube");
+    cube_set(ent->body.bounds,-1,-1,-1,2,2,2);
+    sprintf(ent->name,"%s",name);
+    mgl_callback_set(&ent->body.touch,touch_callback,ent);
     return ent;
 }
 
 int main(int argc, char *argv[])
 {
     int i;
-    GLuint vao;
     float r = 0;
     Space *space;
     Entity *cube1,*cube2;
-    GLuint triangleBufferObject;
     char bGameLoopRunning = 1;
     Vec3D cameraPosition = {0,-10,0.3};
     Vec3D cameraRotation = {90,0,0};
     SDL_Event e;
     Obj *bgobj;
     Sprite *bgtext;
-    const float triangleVertices[] = {
-        0.0f, 0.5f, 0.0f, 1.0f,
-        0.5f, -0.366f, 0.0f, 1.0f,
-        -0.5f, -0.366f, 0.0f, 1.0f,
-        //next part contains vertex colors
-        1.0f, 0.0f, 0.0f, 1.0f,
-        0.0f, 1.0f, 0.0f, 1.0f,
-        0.0f, 0.0f, 1.0f, 1.0f  
-    }; //we love you vertices!
     
     init_logger("gametest3d.log");
     if (graphics3d_init(1024,768,1,"gametest3d",33) != 0)
@@ -77,19 +84,11 @@ int main(int argc, char *argv[])
     obj_init();
     entity_init(255);
     
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao); //make our vertex array object, we need it to restore state we set after binding it. Re-binding reloads the state associated with it.
-    
-    glGenBuffers(1, &triangleBufferObject); //create the buffer
-    glBindBuffer(GL_ARRAY_BUFFER, triangleBufferObject); //we're "using" this one now
-    glBufferData(GL_ARRAY_BUFFER, sizeof(triangleVertices), triangleVertices, GL_STATIC_DRAW); //formatting the data for the buffer
-    glBindBuffer(GL_ARRAY_BUFFER, 0); //unbind any buffers
-    
     bgobj = obj_load("models/mountainvillage.obj");
     bgtext = LoadSprite("models/mountain_text.png",1024,1024);
     
-    cube1 = newCube(vec3d(0,0,0));
-    cube2 = newCube(vec3d(10,0,0));
+    cube1 = newCube(vec3d(0,0,0),"Cubert");
+    cube2 = newCube(vec3d(10,0,0),"Hobbes");
     
     cube2->body.velocity.x = -0.1;
     

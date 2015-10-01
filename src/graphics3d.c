@@ -124,6 +124,7 @@ void graphics3d_next_frame()
     {
         SDL_Delay(__graphics3d_frame_delay - (now - then));        
     }
+    slog("ticks passed this frame: %i",(now - then));
     then = now;
 }
 

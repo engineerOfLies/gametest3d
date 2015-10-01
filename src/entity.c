@@ -59,6 +59,7 @@ Entity *entity_new()
             memset(&__entity_list[i],0,sizeof(Entity));
             __entity_list[i].inuse = 1;
             vec3d_set(__entity_list[i].scale,1,1,1);
+            vec4d_set(__entity_list[i].color,1,1,1,1);
             return &__entity_list[i];
         }
     }
@@ -91,8 +92,24 @@ void entity_draw(Entity *ent)
         ent->color,
         ent->texture
     );
-    slog("drawing %s",ent->name);
 }
+
+int entity_is_entity(void *data)
+{
+    if (!data)return 0;
+    if (!__entity_initialized)return 0;
+    if ((Entity *)data < __entity_list)return 0;
+    if ((Entity *)data >= (__entity_list + __entity_max))return 0;
+    return 1;
+}
+
+
+
+
+
+
+
+
 
 
 /*eol@eof*/
