@@ -17,8 +17,11 @@ typedef struct Entity_S
     Vec3D scale;
     Vec4D color;
     Obj *objModel;
+    Obj *objAnimation[24];
+    float frame;
     Sprite *texture;    /**<object texture*/
     Body body;
+    void (*think)(struct Entity_S *self);
 }Entity;
 
 /**
@@ -37,6 +40,7 @@ Entity *entity_new();
  * @brief draws all active entities
  */
 void entity_draw_all();
+void entity_think_all();
 
 /**
  * @brief draws an entity

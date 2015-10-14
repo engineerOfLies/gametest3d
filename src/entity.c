@@ -66,6 +66,19 @@ Entity *entity_new()
     return NULL;
 }
 
+void entity_think_all()
+{
+    int i;
+    for (i = 0; i < __entity_max; i++)
+    {
+        if ((__entity_list[i].inuse) &&
+            (__entity_list[i].think != NULL))
+        {
+            __entity_list[i].think(&__entity_list[i]);
+        }
+    }
+}
+
 void entity_draw_all()
 {
     int i;

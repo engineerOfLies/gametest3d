@@ -45,19 +45,37 @@ void touch_callback(void *data, void *context)
     slog("touching me.... touching youuuuuuuu");
 }
 
+void think(Entity *self)
+{
+    if (!self)return;
+    self->frame += 0.1;
+    if (self->frame >= 24)self->frame = 0;
+    self->objModel = self->objAnimation[(int)self->frame];
+}
+
+
 Entity *newCube(Vec3D position,const char *name)
 {
     Entity * ent;
+    char buffer[255];
+    int i;
     ent = entity_new();
     if (!ent)
     {
         return NULL;
     }
-    ent->objModel = obj_load("models/cube.obj");
-    ent->texture = LoadSprite("models/cube_text.png",1024,1024);
+    for (i = 0; i < 24;i++)
+    {
+        sprintf(buffer,"models/robot/walk_bot_%06i.obj",i + 1);
+        ent->objAnimation[i] = obj_load(buffer);
+    }
+    ent->objModel = ent->objAnimation[0];
+    ent->texture = LoadSprite("models/robot/robot.png",1024,1024);
     vec3d_cpy(ent->body.position,position);
     cube_set(ent->body.bounds,-1,-1,-1,2,2,2);
+    ent->rotation.x = 90;
     sprintf(ent->name,"%s",name);
+    ent->think = think;
     mgl_callback_set(&ent->body.touch,touch_callback,ent);
     return ent;
 }
@@ -72,7 +90,7 @@ int main(int argc, char *argv[])
     Vec3D cameraPosition = {0,-10,0.3};
     Vec3D cameraRotation = {90,0,0};
     SDL_Event e;
-    Obj *bgobj;
+    Obj *bgobj,*chicken;
     Sprite *bgtext;
     
     init_logger("gametest3d.log");
@@ -84,6 +102,7 @@ int main(int argc, char *argv[])
     obj_init();
     entity_init(255);
     
+    chicken = obj_load("models/chicken.obj");
     bgobj = obj_load("models/mountainvillage.obj");
     bgtext = LoadSprite("models/mountain_text.png",1024,1024);
     
@@ -99,6 +118,7 @@ int main(int argc, char *argv[])
     space_add_body(space,&cube2->body);
     while (bGameLoopRunning)
     {
+        entity_think_all();
         for (i = 0; i < 100;i++)
         {
             space_do_step(space);
@@ -193,7 +213,46 @@ int main(int argc, char *argv[])
             cameraPosition,
             cameraRotation);
         
-        entity_draw_all();  
+        entity_draw_all();
+        glPushMatrix();
+        glTranslatef(-5,0,0);
+        obj_draw(
+            chicken,
+            vec3d(0,0,0),
+            vec3d(0,0,0),
+            vec3d(1,1,1),
+            vec4d(1,0,0,1),
+            NULL
+        );
+        glPushMatrix();
+        
+        glTranslatef(0,1,0);
+        glScalef(0.5,0.5,0.5);
+        
+        glRotatef(45,0.0,0.0,1.00);
+        obj_draw(
+            chicken,
+            vec3d(0,0,0),
+            vec3d(0,0,0),
+            vec3d(1,1,1),
+            vec4d(0,1,0,1),
+            NULL
+        );        
+        glPushMatrix();
+        glRotatef(45,0.0,1.0,0.0);
+        obj_draw(
+            chicken,
+            vec3d(0,0,0),
+            vec3d(0,0,0),
+            vec3d(0.5,0.5,0.5),
+            vec4d(0,0,1,1),
+            NULL
+        );        
+        
+        glPopMatrix();
+        glPopMatrix();
+        
+        glPopMatrix();
         obj_draw(
             bgobj,
             vec3d(0,0,2),
