@@ -48,8 +48,20 @@ void touch_callback(void *data, void *context)
 void think(Entity *self)
 {
     if (!self)return;
-    self->frame += 0.1;
-    if (self->frame >= 24)self->frame = 0;
+    switch(self->state)
+    {
+        case 0:
+            self->frame = 0;
+            break;
+        case 1:
+            self->frame += 0.3;
+            if (self->frame >= 24)self->frame = 0;
+            break;
+        case 2:
+            self->frame -= 0.3;
+            if (self->frame < 0)self->frame = 23;
+            break;
+    }
     self->objModel = self->objAnimation[(int)self->frame];
 }
 
@@ -76,6 +88,7 @@ Entity *newCube(Vec3D position,const char *name)
     ent->rotation.x = 90;
     sprintf(ent->name,"%s",name);
     ent->think = think;
+    ent->state = 0;
     mgl_callback_set(&ent->body.touch,touch_callback,ent);
     return ent;
 }
@@ -102,7 +115,7 @@ int main(int argc, char *argv[])
     obj_init();
     entity_init(255);
     
-    chicken = obj_load("models/chicken.obj");
+    chicken = obj_load("models/monkey.obj");
     bgobj = obj_load("models/mountainvillage.obj");
     bgtext = LoadSprite("models/mountain_text.png",1024,1024);
     
@@ -202,6 +215,11 @@ int main(int argc, char *argv[])
                 else if (e.key.keysym.sym == SDLK_DOWN)
                 {
                     cameraRotation.x -= 1;
+                }
+                else if (e.key.keysym.sym == SDLK_n)
+                {
+                    cube1->state ++;
+                    if (cube1->state >= 3)cube1->state = 0;
                 }
             }
         }

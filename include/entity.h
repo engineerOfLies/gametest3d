@@ -18,6 +18,7 @@ typedef struct Entity_S
     Vec4D color;
     Obj *objModel;
     Obj *objAnimation[24];
+    int state;
     float frame;
     Sprite *texture;    /**<object texture*/
     Body body;
