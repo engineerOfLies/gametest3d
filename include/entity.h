@@ -6,7 +6,7 @@
 #include "sprite.h"
 #include "collisions.h"
 #include "body.h"
-
+#include "spawn.h"
 typedef struct Entity_S
 {
     int inuse;
@@ -23,6 +23,7 @@ typedef struct Entity_S
     Sprite *texture;    /**<object texture*/
     Body body;
     void (*think)(struct Entity_S *self);
+    Spawn *spawndata;  /**<pointer to map spawn item*/
 }Entity;
 
 /**

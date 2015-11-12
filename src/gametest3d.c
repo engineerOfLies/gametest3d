@@ -55,11 +55,11 @@ void think(Entity *self)
             break;
         case 1:
             self->frame += 0.3;
-            if (self->frame >= 24)self->frame = 0;
+            if (self->frame >= 12)self->frame = 0;
             break;
         case 2:
             self->frame -= 0.3;
-            if (self->frame < 0)self->frame = 23;
+            if (self->frame < 0)self->frame = 11;
             break;
     }
     self->objModel = self->objAnimation[(int)self->frame];
@@ -76,16 +76,17 @@ Entity *newCube(Vec3D position,const char *name)
     {
         return NULL;
     }
-    for (i = 0; i < 24;i++)
+    for (i = 0; i < 12;i++)
     {
-        sprintf(buffer,"models/robot/walk_bot_%06i.obj",i + 1);
+        sprintf(buffer,"models/bennes/bennes_%06i.obj",i + 1);
         ent->objAnimation[i] = obj_load(buffer);
     }
     ent->objModel = ent->objAnimation[0];
-    ent->texture = LoadSprite("models/robot/robot.png",1024,1024);
+    ent->texture = LoadSprite("models/bennes.png",1024,1024);
     vec3d_cpy(ent->body.position,position);
     cube_set(ent->body.bounds,-1,-1,-1,2,2,2);
     ent->rotation.x = 90;
+    vec3d_set(ent->scale,0.5,0.5,0.5);
     sprintf(ent->name,"%s",name);
     ent->think = think;
     ent->state = 0;
